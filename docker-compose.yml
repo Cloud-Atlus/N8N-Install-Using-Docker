@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: n8n-mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=N8nabcd1234-n8n
+      - MYSQL_DATABASE=n8n
+      - MYSQL_USER=n8n
+      - MYSQL_PASSWORD=N8nabcd1234-db-user
+    ports:
+      - '3306:3306'  # Optional: Remove in production for security
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=N8nabcd1234-n8n"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    container_name: n8n
+    restart: always
+    ports:
+      - '5678:5678'
+    environment:
+      - DB_TYPE=mysql
+      - DB_MYSQLDB_HOST=mysql
+      - DB_MYSQLDB_PORT=3306
+      - DB_MYSQLDB_DATABASE=n8n
+      - DB_MYSQLDB_USER=n8n
+      - DB_MYSQLDB_PASSWORD=N8nabcd1234-db-user
+      - N8N_BASIC_AUTH_ACTIVE=true  # Enabled authentication
+      - N8N_BASIC_AUTH_USER=admin    # Simple username
+      - N8N_BASIC_AUTH_PASSWORD=admin123  # Simple password
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}  # Asia/Karachi from .env
+      - TZ=${TZ}  # Asia/Karachi from .env
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./local-files:/files  # Optional: For file-based nodes
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  n8n_data:
+  mysql_data:
+
+
+  # n8n user name and passord is 
+  # ali.saimtech@gmail.com
+  # PasswordU$1

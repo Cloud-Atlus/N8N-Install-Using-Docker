@@ -6,16 +6,16 @@ services:
     container_name: n8n-mysql
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD=N8nabcd1234-n8n
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=n8n
       - MYSQL_USER=n8n
-      - MYSQL_PASSWORD=N8nabcd1234-db-user
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     ports:
       - '3307:3307'  # Optional: Remove in production for security
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=N8nabcd1234-n8n"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=${MYSQL_ROOT_PASSWORD}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -32,19 +32,19 @@ services:
       - DB_MYSQLDB_PORT=3307
       - DB_MYSQLDB_DATABASE=n8n
       - DB_MYSQLDB_USER=n8n
-      - DB_MYSQLDB_PASSWORD=N8nabcd1234-db-user
-      - N8N_BASIC_AUTH_ACTIVE=true  # Enabled authentication
-      - N8N_BASIC_AUTH_USER=admin    # Simple username
-      - N8N_BASIC_AUTH_PASSWORD=admin123  # Simple password
-      - N8N_HOST=localhost
+      - DB_MYSQLDB_PASSWORD=${MYSQL_PASSWORD}
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      - N8N_HOST=${N8N_DOMAIN}
       - N8N_PORT=5678
-      - N8N_PROTOCOL=http
-      - WEBHOOK_URL=http://localhost:5678/
-      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}  # Asia/Karachi from .env
-      - TZ=${TZ}  # Asia/Karachi from .env
+      - N8N_PROTOCOL=${N8N_PROTOCOL}
+      - WEBHOOK_URL=${N8N_PROTOCOL}://${N8N_DOMAIN}/
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - TZ=${TZ}
     volumes:
       - n8n_data:/home/node/.n8n
-      - ./local-files:/files  # Optional: For file-based nodes
+      - ./local-files:/files
     depends_on:
       mysql:
         condition: service_healthy
@@ -52,8 +52,3 @@ services:
 volumes:
   n8n_data:
   mysql_data:
-
-
-  # n8n user name and passord is 
-  # ali.saimtech@gmail.com
-  # PasswordU$1
